@@ -19,8 +19,9 @@ export default function ProgramsPage() {
   const [showTemplates, setShowTemplates] = useState(false)
 
   const { isLoading } = useSheetData(TABS.PROGRAMS, parsePrograms, setPrograms)
-  if (isLoading) return <PageSpinner />
   const appendProgram = useAppendRow(TABS.PROGRAMS)
+
+  if (isLoading) return <PageSpinner />
 
   async function setActive(id: string) {
     setActiveProgramId(id)
