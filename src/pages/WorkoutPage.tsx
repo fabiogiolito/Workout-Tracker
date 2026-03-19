@@ -6,15 +6,13 @@ import { PageHeader } from '@/components/layout/PageHeader'
 import { PageSpinner } from '@/components/layout/PageSpinner'
 import { useWorkoutStore } from '@/store/workoutStore'
 import { useProgramStore } from '@/store/programStore'
-import { useEquipmentStore } from '@/store/equipmentStore'
 import { useSheetStore } from '@/store/sheetStore'
 import { useRestTimer } from '@/hooks/useRestTimer'
 import { useExerciseTimer } from '@/hooks/useExerciseTimer'
 import { useAppendRow, useSheetData } from '@/hooks/useSheetSync'
-import { parseWorkouts, parseSets, parseEquipment } from '@/lib/google/sheetReader'
+import { parseWorkouts, parseSets } from '@/lib/google/sheetReader'
 import { workoutToRow, setToRow } from '@/lib/google/sheetWriter'
 import { suggestNextWeight, getBestPerSession, getPersonalBest, getPersonalBestDuration } from '@/lib/progression/progressionEngine'
-import { getBarbellOptions, getDumbbellOptions, findNearestWeight, formatPlateBreakdown } from '@/lib/equipment/weightSuggester'
 import { EXERCISE_LIBRARY, getExerciseById } from '@/constants/exerciseLibrary'
 import { formatDuration, formatDateShort } from '@/lib/utils/formatters'
 import { TABS } from '@/lib/google/sheetSchema'
@@ -29,7 +27,6 @@ export default function WorkoutPage() {
   const navigate = useNavigate()
   const { activeSession, activeSets, allSessions, allSets, startSession, finishSession, addSet, loadData } = useWorkoutStore()
   const { programs, activeProgramId } = useProgramStore()
-  const { equipment, setEquipment } = useEquipmentStore()
   const sheetId = useSheetStore(s => s.activeSheetId)
   const restTimer = useRestTimer()
   const [_showDaySelector, setShowDaySelector] = useState(false)
@@ -42,8 +39,6 @@ export default function WorkoutPage() {
 
   const { isLoading: loadingWorkouts } = useSheetData(TABS.WORKOUTS, parseWorkouts, (data) => loadData(data, allSets))
   const { isLoading: loadingSets } = useSheetData(TABS.SETS, parseSets, (data) => loadData(allSessions, data))
-  const { isLoading: loadingEquipment } = useSheetData(TABS.EQUIPMENT, parseEquipment, setEquipment)
-
   const appendWorkout = useAppendRow(TABS.WORKOUTS)
   const appendSet = useAppendRow(TABS.SETS)
 
@@ -135,7 +130,7 @@ export default function WorkoutPage() {
     navigate('/dashboard')
   }
 
-  if (loadingWorkouts || loadingSets || loadingEquipment) return <PageSpinner />
+  if (loadingWorkouts || loadingSets) return <PageSpinner />
 
   if (!activeSession && (!activeProgram || programs.length === 0)) {
     return (
@@ -278,7 +273,6 @@ export default function WorkoutPage() {
             exercise={exercise}
             loggedSets={slotSets}
             historySets={historySets}
-            equipment={equipment}
             isExpanded={isExpanded}
             onToggle={() => setExpandedExercise(isExpanded ? null : slot.exerciseId)}
             onLogSet={(w, r, d, warmup) => logSet(slot, exercise, w, r, d, warmup)}
@@ -308,14 +302,13 @@ interface ExerciseBlockProps {
   exercise: Exercise
   loggedSets: LoggedSet[]
   historySets: LoggedSet[]
-  equipment: import('@/types/equipment').Equipment[]
   isExpanded: boolean
   onToggle: () => void
   onLogSet: (weightKg: number | undefined, reps: number | undefined, durationSeconds: number | undefined, isWarmup?: boolean) => void
   onSetTimerActive: (setNum: number | null) => void
 }
 
-function ExerciseBlock({ slot, exercise, loggedSets, historySets, equipment, isExpanded, onToggle, onLogSet }: ExerciseBlockProps) {
+function ExerciseBlock({ slot, exercise, loggedSets, historySets, isExpanded, onToggle, onLogSet }: ExerciseBlockProps) {
   const [weight, setWeight] = useState('')
   const [reps, setReps] = useState('')
   const sessions = getBestPerSession(historySets)
@@ -330,20 +323,6 @@ function ExerciseBlock({ slot, exercise, loggedSets, historySets, equipment, isE
       setWeight(String(suggestion.suggestedWeight))
     }
   }, [suggestion.suggestedWeight])
-
-  // Find equipment for suggestions
-  const barbell = equipment.find(e => e.type === 'barbell' && e.enabled)
-  const dumbbell = equipment.find(e => e.type === 'dumbbell_set' && e.enabled)
-
-  let weightOptions: number[] = []
-  if (barbell && exercise.equipmentTags.includes('barbell')) {
-    weightOptions = getBarbellOptions(barbell)
-  } else if (dumbbell && exercise.equipmentTags.includes('dumbbell')) {
-    weightOptions = getDumbbellOptions(dumbbell)
-  }
-
-  const nearest = suggestion.suggestedWeight > 0 ? findNearestWeight(suggestion.suggestedWeight, weightOptions) : null
-  const plateBreakdown = nearest && barbell ? formatPlateBreakdown(nearest.totalKg, barbell) : null
 
   function handleLog(isWarmup = false) {
     if (exercise.isTimed) {
@@ -381,7 +360,6 @@ function ExerciseBlock({ slot, exercise, loggedSets, historySets, equipment, isE
           {!exercise.isTimed && suggestion.suggestedWeight > 0 && (
             <div>
               <p className="text-xs text-neutral-400">{suggestion.reason}</p>
-              {plateBreakdown && <p className="text-xs text-neutral-500 mt-0.5">{plateBreakdown}</p>}
             </div>
           )}
 
@@ -432,8 +410,7 @@ function ExerciseBlock({ slot, exercise, loggedSets, historySets, equipment, isE
                   onWeightChange={setWeight}
                   onRepsChange={setReps}
                   onLog={handleLog}
-                  suggestion={nearest?.totalKg}
-                  weightOptions={weightOptions}
+                  suggestion={suggestion.suggestedWeight > 0 ? suggestion.suggestedWeight : undefined}
                 />
               )}
             </div>
@@ -489,15 +466,12 @@ function TimedSetInput({ exerciseTimer, onLog, slot, exercise }: {
   )
 }
 
-function RepsSetInput({ weight, reps, onWeightChange, onRepsChange, onLog, suggestion, weightOptions }: {
+function RepsSetInput({ weight, reps, onWeightChange, onRepsChange, onLog, suggestion }: {
   weight: string; reps: string
   onWeightChange: (v: string) => void; onRepsChange: (v: string) => void
   onLog: (warmup?: boolean) => void
   suggestion?: number
-  weightOptions: number[]
 }) {
-  const [showWeightPicker, setShowWeightPicker] = useState(false)
-
   return (
     <div className="space-y-3">
       {suggestion !== undefined && (
@@ -531,33 +505,6 @@ function RepsSetInput({ weight, reps, onWeightChange, onRepsChange, onLog, sugge
           />
         </div>
       </div>
-      {weightOptions.length > 0 && (
-        <div>
-          <button
-            onClick={() => setShowWeightPicker(!showWeightPicker)}
-            className="text-xs text-neutral-400 flex items-center gap-1"
-          >
-            <ChevronDown size={12} className={cn(showWeightPicker ? 'rotate-180' : '')} />
-            Available weights
-          </button>
-          {showWeightPicker && (
-            <div className="flex flex-wrap gap-1.5 mt-2">
-              {weightOptions.slice(0, 20).map(w => (
-                <button
-                  key={w}
-                  onClick={() => { onWeightChange(String(w)); setShowWeightPicker(false) }}
-                  className={cn(
-                    'text-xs px-2.5 py-1 rounded-full border transition-colors',
-                    weight === String(w) ? 'border-black bg-black text-white' : 'border-neutral-200'
-                  )}
-                >
-                  {w}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
       <div className="flex gap-2">
         <button
           onClick={() => onLog(false)}

@@ -7,7 +7,6 @@ import WorkoutPage from './pages/WorkoutPage'
 import HistoryPage from './pages/HistoryPage'
 import ProgramsPage from './pages/ProgramsPage'
 import ProgramEditorPage from './pages/ProgramEditorPage'
-import EquipmentPage from './pages/EquipmentPage'
 import NutritionPage from './pages/NutritionPage'
 import MetricsPage from './pages/MetricsPage'
 import SettingsPage from './pages/SettingsPage'
@@ -41,7 +40,6 @@ export default function App() {
         <Route path="programs" element={<ProgramsPage />} />
         <Route path="programs/new" element={<ProgramEditorPage />} />
         <Route path="programs/:programId" element={<ProgramEditorPage />} />
-        <Route path="equipment" element={<EquipmentPage />} />
         <Route path="nutrition" element={<NutritionPage />} />
         <Route path="metrics" element={<MetricsPage />} />
         <Route path="settings" element={<SettingsPage />} />

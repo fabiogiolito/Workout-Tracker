@@ -1,4 +1,3 @@
-import type { Equipment } from '@/types/equipment'
 import type { Exercise } from '@/types/exercise'
 import type { Program } from '@/types/program'
 import type { WorkoutSession, LoggedSet } from '@/types/workout'
@@ -7,21 +6,6 @@ import type { NutritionEntry, FoodItem, BodyMetric } from '@/types/nutrition'
 function s(v: string | number | boolean | undefined | null): string {
   if (v === undefined || v === null) return ''
   return String(v)
-}
-
-export function equipmentToRow(e: Equipment): string[] {
-  return [
-    e.id,
-    e.type,
-    e.name,
-    String(e.enabled),
-    s(e.barWeightKg),
-    e.availablePlates ? JSON.stringify(e.availablePlates) : '',
-    e.dumbbellWeights ? JSON.stringify(e.dumbbellWeights) : '',
-    e.kettlebellWeights ? JSON.stringify(e.kettlebellWeights) : '',
-    e.notes ?? '',
-    e.updatedAt,
-  ]
 }
 
 export function exerciseToRow(e: Exercise): string[] {

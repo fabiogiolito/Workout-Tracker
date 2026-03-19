@@ -1,4 +1,3 @@
-import type { Equipment, PlateCount } from '@/types/equipment'
 import type { Exercise, MuscleGroup, EquipmentTag } from '@/types/exercise'
 import type { Program, WorkoutDay } from '@/types/program'
 import type { WorkoutSession, LoggedSet } from '@/types/workout'
@@ -15,30 +14,6 @@ function n(val: string | undefined): number {
 }
 function ni(val: string | undefined): number | undefined {
   return val ? parseFloat(val) : undefined
-}
-
-// Skip header row, parse each subsequent row
-export function parseEquipment(rows: string[][]): Equipment[] {
-  return rows.slice(1).filter(r => r[0]).map(r => {
-    let plates: PlateCount[] | undefined
-    try { plates = r[5] ? JSON.parse(r[5]) : undefined } catch { plates = undefined }
-    let dumbbells: number[] | undefined
-    try { dumbbells = r[6] ? JSON.parse(r[6]) : undefined } catch { dumbbells = undefined }
-    let kettlebells: number[] | undefined
-    try { kettlebells = r[7] ? JSON.parse(r[7]) : undefined } catch { kettlebells = undefined }
-    return {
-      id: s(r[0]),
-      type: s(r[1]) as Equipment['type'],
-      name: s(r[2]),
-      enabled: b(r[3]),
-      barWeightKg: ni(r[4]),
-      availablePlates: plates,
-      dumbbellWeights: dumbbells,
-      kettlebellWeights: kettlebells,
-      notes: r[8],
-      updatedAt: s(r[9]),
-    }
-  })
 }
 
 export function parseExercises(rows: string[][]): Exercise[] {

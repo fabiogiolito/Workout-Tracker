@@ -112,13 +112,6 @@ export default function SettingsPage() {
           <p className="text-sm">Body metrics</p>
           <ChevronRight size={16} className="text-neutral-400" />
         </button>
-        <button
-          onClick={() => navigate('/equipment')}
-          className="flex items-center justify-between w-full py-3 border-b border-neutral-100"
-        >
-          <p className="text-sm">Equipment</p>
-          <ChevronRight size={16} className="text-neutral-400" />
-        </button>
       </div>
 
       {/* Account */}

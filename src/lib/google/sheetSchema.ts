@@ -1,6 +1,5 @@
 export const TABS = {
   CONFIG: 'Config',
-  EQUIPMENT: 'Equipment',
   EXERCISES: 'Exercises',
   PROGRAMS: 'Programs',
   WORKOUTS: 'Workouts',
@@ -12,7 +11,6 @@ export const TABS = {
 
 export const HEADERS: Record<string, string[]> = {
   [TABS.CONFIG]: ['key', 'value', 'updated_at'],
-  [TABS.EQUIPMENT]: ['id', 'type', 'name', 'enabled', 'bar_weight_kg', 'available_plates_json', 'dumbbell_weights_json', 'kettlebell_weights_json', 'notes', 'updated_at'],
   [TABS.EXERCISES]: ['id', 'name', 'muscle_groups', 'equipment_types', 'is_timed', 'default_duration_seconds', 'is_custom', 'notes', 'created_at'],
   [TABS.PROGRAMS]: ['id', 'name', 'description', 'days_json', 'created_at', 'updated_at'],
   [TABS.WORKOUTS]: ['id', 'program_id', 'day_id', 'day_label', 'started_at', 'finished_at', 'notes'],
