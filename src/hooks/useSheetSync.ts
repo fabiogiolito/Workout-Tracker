@@ -15,7 +15,10 @@ export function useSheetData<T>(
   const [error, setError] = useState<string | null>(null)
 
   const load = useCallback(async () => {
-    if (!sheetId || !isAuth) return
+    if (!sheetId || !isAuth) {
+      setIsLoading(false)
+      return
+    }
     setIsLoading(true)
     setError(null)
     try {
