@@ -1,16 +1,40 @@
 import { useAuthStore } from '@/store/authStore'
+import { isGoogleLoaded } from './auth'
 import { HEADERS, TABS } from './sheetSchema'
 
 const BASE = 'https://sheets.googleapis.com/v4/spreadsheets'
 const DRIVE_BASE = 'https://www.googleapis.com/drive/v3/files'
 
+function waitForGoogle(timeoutMs = 10_000): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (isGoogleLoaded()) { resolve(); return }
+    const deadline = setTimeout(() => {
+      clearInterval(poll)
+      reject(new Error('Google library did not load in time'))
+    }, timeoutMs)
+    const poll = setInterval(() => {
+      if (isGoogleLoaded()) {
+        clearTimeout(deadline)
+        clearInterval(poll)
+        resolve()
+      }
+    }, 100)
+  })
+}
+
 async function getToken(): Promise<string> {
-  const { token, refreshToken } = useAuthStore.getState()
+  const { token, refreshToken, signOut } = useAuthStore.getState()
   if (token && token.expiresAt > Date.now() + 60_000) {
     return token.accessToken
   }
-  const newToken = await refreshToken()
-  return newToken.accessToken
+  try {
+    await waitForGoogle()
+    const newToken = await refreshToken()
+    return newToken.accessToken
+  } catch {
+    signOut()
+    throw new Error('Session expired. Please sign in again.')
+  }
 }
 
 async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
