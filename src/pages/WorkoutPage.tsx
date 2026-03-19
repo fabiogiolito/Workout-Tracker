@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Check, Plus, X, ChevronDown, History, Timer } from 'lucide-react'
 import { v4 as uuid } from 'uuid'
 import { PageHeader } from '@/components/layout/PageHeader'
+import { PageSpinner } from '@/components/layout/PageSpinner'
 import { useWorkoutStore } from '@/store/workoutStore'
 import { useProgramStore } from '@/store/programStore'
 import { useEquipmentStore } from '@/store/equipmentStore'
@@ -39,9 +40,9 @@ export default function WorkoutPage() {
   const [_activeTimer, setActiveTimer] = useState<{ exerciseId: string; setNum: number } | null>(null)
   const [prAlert, setPrAlert] = useState<string | null>(null)
 
-  useSheetData(TABS.WORKOUTS, parseWorkouts, (data) => loadData(data, allSets))
-  useSheetData(TABS.SETS, parseSets, (data) => loadData(allSessions, data))
-  useSheetData(TABS.EQUIPMENT, parseEquipment, setEquipment)
+  const { isLoading: loadingWorkouts } = useSheetData(TABS.WORKOUTS, parseWorkouts, (data) => loadData(data, allSets))
+  const { isLoading: loadingSets } = useSheetData(TABS.SETS, parseSets, (data) => loadData(allSessions, data))
+  const { isLoading: loadingEquipment } = useSheetData(TABS.EQUIPMENT, parseEquipment, setEquipment)
 
   const appendWorkout = useAppendRow(TABS.WORKOUTS)
   const appendSet = useAppendRow(TABS.SETS)
@@ -133,6 +134,8 @@ export default function WorkoutPage() {
     setShowFinishConfirm(false)
     navigate('/dashboard')
   }
+
+  if (loadingWorkouts || loadingSets || loadingEquipment) return <PageSpinner />
 
   if (!activeSession && (!activeProgram || programs.length === 0)) {
     return (

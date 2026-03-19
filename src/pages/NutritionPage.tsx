@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Plus, Search, X, Droplets, ChevronDown, Trash2 } from 'lucide-react'
 import { v4 as uuid } from 'uuid'
 import { PageHeader } from '@/components/layout/PageHeader'
+import { PageSpinner } from '@/components/layout/PageSpinner'
 import { useNutritionStore } from '@/store/nutritionStore'
 import { useSheetStore } from '@/store/sheetStore'
 import { useSheetData, useAppendRow } from '@/hooks/useSheetSync'
@@ -26,8 +27,10 @@ export default function NutritionPage() {
   const [quantity, setQuantity] = useState('100')
   const appendNutrition = useAppendRow(TABS.NUTRITION)
 
-  useSheetData(TABS.NUTRITION, parseNutrition, setEntries)
-  useSheetData(TABS.FOODS, parseFoods, setCustomFoods)
+  const { isLoading: loadingNutrition } = useSheetData(TABS.NUTRITION, parseNutrition, setEntries)
+  const { isLoading: loadingFoods } = useSheetData(TABS.FOODS, parseFoods, setCustomFoods)
+
+  if (loadingNutrition || loadingFoods) return <PageSpinner />
 
   const todayDate = today()
   const todayEntries = entries.filter(e => e.date === todayDate)

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { v4 as uuid } from 'uuid'
 import { PageHeader } from '@/components/layout/PageHeader'
+import { PageSpinner } from '@/components/layout/PageSpinner'
 import { useNutritionStore } from '@/store/nutritionStore'
 import { useSheetStore } from '@/store/sheetStore'
 import { useSheetData, useAppendRow } from '@/hooks/useSheetSync'
@@ -18,7 +19,8 @@ export default function MetricsPage() {
   const [saving, setSaving] = useState(false)
   const appendMetric = useAppendRow(TABS.METRICS)
 
-  useSheetData(TABS.METRICS, parseMetrics, setMetrics)
+  const { isLoading } = useSheetData(TABS.METRICS, parseMetrics, setMetrics)
+  if (isLoading) return <PageSpinner />
 
   const sorted = [...metrics].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
   const weightData = sorted.filter(m => m.bodyWeightKg).map(m => ({ d: formatDateShort(m.date), w: m.bodyWeightKg }))

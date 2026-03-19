@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Plus, Trash2, ChevronDown } from 'lucide-react'
 import { v4 as uuid } from 'uuid'
 import { PageHeader } from '@/components/layout/PageHeader'
+import { PageSpinner } from '@/components/layout/PageSpinner'
 import { useEquipmentStore } from '@/store/equipmentStore'
 import { useSheetStore } from '@/store/sheetStore'
 import { useSheetData, useAppendRow } from '@/hooks/useSheetSync'
@@ -21,7 +22,8 @@ export default function EquipmentPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const appendEquipment = useAppendRow(TABS.EQUIPMENT)
 
-  useSheetData(TABS.EQUIPMENT, parseEquipment, setEquipment)
+  const { isLoading } = useSheetData(TABS.EQUIPMENT, parseEquipment, setEquipment)
+  if (isLoading) return <PageSpinner />
 
   async function saveEquipment(item: Equipment) {
     upsertEquipment(item)

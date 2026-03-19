@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Plus, Check, ChevronRight, Trash2 } from 'lucide-react'
 import { PageHeader } from '@/components/layout/PageHeader'
+import { PageSpinner } from '@/components/layout/PageSpinner'
 import { useProgramStore } from '@/store/programStore'
 import { useSheetStore } from '@/store/sheetStore'
 import { useSheetData, useAppendRow } from '@/hooks/useSheetSync'
@@ -17,7 +18,8 @@ export default function ProgramsPage() {
   const sheetId = useSheetStore(s => s.activeSheetId)
   const [showTemplates, setShowTemplates] = useState(false)
 
-  useSheetData(TABS.PROGRAMS, parsePrograms, setPrograms)
+  const { isLoading } = useSheetData(TABS.PROGRAMS, parsePrograms, setPrograms)
+  if (isLoading) return <PageSpinner />
   const appendProgram = useAppendRow(TABS.PROGRAMS)
 
   async function setActive(id: string) {

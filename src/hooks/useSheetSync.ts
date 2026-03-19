@@ -11,7 +11,7 @@ export function useSheetData<T>(
 ) {
   const sheetId = useSheetStore(s => s.activeSheetId)
   const isAuth = useAuthStore(s => s.isAuthenticated)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   const load = useCallback(async () => {

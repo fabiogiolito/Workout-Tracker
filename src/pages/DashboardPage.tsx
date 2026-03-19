@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 import { PageHeader } from '@/components/layout/PageHeader'
+import { PageSpinner } from '@/components/layout/PageSpinner'
 import { useWorkoutStore } from '@/store/workoutStore'
 import { useProgramStore } from '@/store/programStore'
 import { useNutritionStore } from '@/store/nutritionStore'
@@ -18,15 +19,17 @@ export default function DashboardPage() {
   const { entries, macroGoals, waterToday } = useNutritionStore()
   const sheetTitle = useSheetStore(s => s.activeSheetTitle)
 
-  useSheetData(TABS.WORKOUTS, parseWorkouts, (data) => {
+  const { isLoading: loadingWorkouts } = useSheetData(TABS.WORKOUTS, parseWorkouts, (data) => {
     const sets = useWorkoutStore.getState().allSets
     loadWorkouts(data, sets)
   })
-  useSheetData(TABS.SETS, parseSets, (data) => {
+  const { isLoading: loadingSets } = useSheetData(TABS.SETS, parseSets, (data) => {
     const sessions = useWorkoutStore.getState().allSessions
     loadWorkouts(sessions, data)
   })
-  useSheetData(TABS.PROGRAMS, parsePrograms, setPrograms)
+  const { isLoading: loadingPrograms } = useSheetData(TABS.PROGRAMS, parsePrograms, setPrograms)
+
+  if (loadingWorkouts || loadingSets || loadingPrograms) return <PageSpinner />
 
   const activeProgram = programs.find(p => p.id === activeProgramId)
 

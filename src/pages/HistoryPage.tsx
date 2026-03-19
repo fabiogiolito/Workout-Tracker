@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ChevronRight, ChevronDown } from 'lucide-react'
 import { PageHeader } from '@/components/layout/PageHeader'
+import { PageSpinner } from '@/components/layout/PageSpinner'
 import { useWorkoutStore } from '@/store/workoutStore'
 import { useSheetData } from '@/hooks/useSheetSync'
 import { parseWorkouts, parseSets } from '@/lib/google/sheetReader'
@@ -15,8 +16,10 @@ export default function HistoryPage() {
   const [expandedSession, setExpandedSession] = useState<string | null>(null)
   const [selectedExercise, setSelectedExercise] = useState<string | null>(null)
 
-  useSheetData(TABS.WORKOUTS, parseWorkouts, (data) => loadData(data, allSets))
-  useSheetData(TABS.SETS, parseSets, (data) => loadData(allSessions, data))
+  const { isLoading: loadingWorkouts } = useSheetData(TABS.WORKOUTS, parseWorkouts, (data) => loadData(data, allSets))
+  const { isLoading: loadingSets } = useSheetData(TABS.SETS, parseSets, (data) => loadData(allSessions, data))
+
+  if (loadingWorkouts || loadingSets) return <PageSpinner />
 
   const finishedSessions = [...allSessions]
     .filter(s => s.finishedAt)
