@@ -29,8 +29,6 @@ export default function DashboardPage() {
   })
   const { isLoading: loadingPrograms } = useSheetData(TABS.PROGRAMS, parsePrograms, setPrograms)
 
-  if (loadingWorkouts || loadingSets || loadingPrograms) return <PageSpinner />
-
   const activeProgram = programs.find(p => p.id === activeProgramId)
 
   // Determine next suggested day
@@ -89,6 +87,8 @@ export default function DashboardPage() {
     }
     return flagged >= 2
   }, [allSets])
+
+  if (loadingWorkouts || loadingSets || loadingPrograms) return <PageSpinner />
 
   return (
     <div className="px-6 pb-6">
