@@ -310,7 +310,7 @@ interface ExerciseBlockProps {
 
 function ExerciseBlock({ slot, exercise, loggedSets, historySets, isExpanded, onToggle, onLogSet }: ExerciseBlockProps) {
   const [weight, setWeight] = useState('')
-  const [reps, setReps] = useState('')
+  const [reps, setReps] = useState(slot.repsTarget ? String(slot.repsTarget) : '')
   const sessions = getBestPerSession(historySets)
   const lastSession = sessions[sessions.length - 1]
   const suggestion = suggestNextWeight(historySets, exercise.muscleGroups, slot.repsTarget)
@@ -324,14 +324,14 @@ function ExerciseBlock({ slot, exercise, loggedSets, historySets, isExpanded, on
     }
   }, [suggestion.suggestedWeight])
 
-  function handleLog(isWarmup = false) {
+  function handleLog() {
     if (exercise.isTimed) {
-      onLogSet(undefined, undefined, exerciseTimer.elapsed > 0 ? exerciseTimer.elapsed : (slot.durationSeconds ?? exercise.defaultDurationSeconds), isWarmup)
+      onLogSet(undefined, undefined, exerciseTimer.elapsed > 0 ? exerciseTimer.elapsed : (slot.durationSeconds ?? exercise.defaultDurationSeconds), false)
     } else {
       const w = weight ? parseFloat(weight) : undefined
       const r = reps ? parseInt(reps) : undefined
       if (!w && !r) return
-      onLogSet(w, r, undefined, isWarmup)
+      onLogSet(w, r, undefined, false)
     }
   }
 
@@ -409,7 +409,7 @@ function ExerciseBlock({ slot, exercise, loggedSets, historySets, isExpanded, on
                   reps={reps}
                   onWeightChange={setWeight}
                   onRepsChange={setReps}
-                  onLog={handleLog}
+                  onLog={() => handleLog()}
                   suggestion={suggestion.suggestedWeight > 0 ? suggestion.suggestedWeight : undefined}
                 />
               )}
@@ -469,11 +469,11 @@ function TimedSetInput({ exerciseTimer, onLog, slot, exercise }: {
 function RepsSetInput({ weight, reps, onWeightChange, onRepsChange, onLog, suggestion }: {
   weight: string; reps: string
   onWeightChange: (v: string) => void; onRepsChange: (v: string) => void
-  onLog: (warmup?: boolean) => void
+  onLog: () => void
   suggestion?: number
 }) {
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {suggestion !== undefined && (
         <button
           onClick={() => onWeightChange(String(suggestion))}
@@ -482,43 +482,52 @@ function RepsSetInput({ weight, reps, onWeightChange, onRepsChange, onLog, sugge
           Use suggested: {suggestion}kg
         </button>
       )}
-      <div className="flex items-center gap-3">
-        <div className="flex-1">
-          <p className="text-xs text-neutral-400 mb-1">Weight (kg)</p>
+      <div>
+        <p className="text-xs text-neutral-400 mb-2">Weight (kg)</p>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => onWeightChange(String(Math.max(0, Math.round(((parseFloat(weight) || 0) - 2.5) * 4) / 4)))}
+            className="w-9 h-9 flex items-center justify-center border border-neutral-200 rounded-lg text-lg font-light"
+          >−</button>
           <input
             type="number"
             value={weight}
             onChange={e => onWeightChange(e.target.value)}
-            className="w-full text-lg font-semibold border-b border-neutral-200 pb-2 outline-none focus:border-black transition-colors bg-transparent"
+            className="flex-1 text-center text-xl font-semibold outline-none bg-transparent"
             placeholder="0"
           />
+          <button
+            onClick={() => onWeightChange(String(Math.round(((parseFloat(weight) || 0) + 2.5) * 4) / 4))}
+            className="w-9 h-9 flex items-center justify-center border border-neutral-200 rounded-lg text-lg font-light"
+          >+</button>
         </div>
-        <div className="text-neutral-300 mt-4">×</div>
-        <div className="flex-1">
-          <p className="text-xs text-neutral-400 mb-1">Reps</p>
+      </div>
+      <div>
+        <p className="text-xs text-neutral-400 mb-2">Reps</p>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => onRepsChange(String(Math.max(0, (parseInt(reps) || 0) - 1)))}
+            className="w-9 h-9 flex items-center justify-center border border-neutral-200 rounded-lg text-lg font-light"
+          >−</button>
           <input
             type="number"
             value={reps}
             onChange={e => onRepsChange(e.target.value)}
-            className="w-full text-lg font-semibold border-b border-neutral-200 pb-2 outline-none focus:border-black transition-colors bg-transparent"
+            className="flex-1 text-center text-xl font-semibold outline-none bg-transparent"
             placeholder="0"
           />
+          <button
+            onClick={() => onRepsChange(String((parseInt(reps) || 0) + 1))}
+            className="w-9 h-9 flex items-center justify-center border border-neutral-200 rounded-lg text-lg font-light"
+          >+</button>
         </div>
       </div>
-      <div className="flex gap-2">
-        <button
-          onClick={() => onLog(false)}
-          className="flex-1 py-3 bg-black text-white text-sm font-medium rounded-xl"
-        >
-          Log set
-        </button>
-        <button
-          onClick={() => onLog(true)}
-          className="px-4 py-3 border border-neutral-200 text-sm rounded-xl text-neutral-600"
-        >
-          Warm-up
-        </button>
-      </div>
+      <button
+        onClick={onLog}
+        className="w-full py-3 bg-black text-white text-sm font-medium rounded-xl"
+      >
+        Log set
+      </button>
     </div>
   )
 }
