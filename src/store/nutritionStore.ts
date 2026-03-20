@@ -15,6 +15,8 @@ interface NutritionState {
   removeEntry: (id: string) => void
   setCustomFoods: (foods: FoodItem[]) => void
   addCustomFood: (food: FoodItem) => void
+  updateCustomFood: (food: FoodItem) => void
+  patchEntries: (updates: NutritionEntry[]) => void
   setMetrics: (metrics: BodyMetric[]) => void
   addMetric: (metric: BodyMetric) => void
   setMacroGoals: (goals: MacroGoals) => void
@@ -46,6 +48,8 @@ export const useNutritionStore = create<NutritionState>()(
       removeEntry: (id) => set(s => ({ entries: s.entries.filter(e => e.id !== id) })),
       setCustomFoods: (foods) => set({ customFoods: foods }),
       addCustomFood: (food) => set(s => ({ customFoods: [...s.customFoods, food] })),
+      updateCustomFood: (food) => set(s => ({ customFoods: s.customFoods.map(f => f.id === food.id ? food : f) })),
+      patchEntries: (updates) => set(s => ({ entries: s.entries.map(e => updates.find(u => u.id === e.id) ?? e) })),
       setMetrics: (metrics) => set({ metrics }),
       addMetric: (metric) => set(s => ({ metrics: [...s.metrics, metric] })),
       setMacroGoals: (goals) => set({ macroGoals: goals }),
