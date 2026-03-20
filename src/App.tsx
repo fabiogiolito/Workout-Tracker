@@ -5,7 +5,6 @@ import ConnectPage from './pages/ConnectPage'
 import DashboardPage from './pages/DashboardPage'
 import WorkoutPage from './pages/WorkoutPage'
 import HistoryPage from './pages/HistoryPage'
-import ProgramsPage from './pages/ProgramsPage'
 import ProgramEditorPage from './pages/ProgramEditorPage'
 import NutritionPage from './pages/NutritionPage'
 import MetricsPage from './pages/MetricsPage'
@@ -37,7 +36,7 @@ export default function App() {
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="workout" element={<WorkoutPage />} />
         <Route path="workout/history" element={<HistoryPage />} />
-        <Route path="programs" element={<ProgramsPage />} />
+        <Route path="programs" element={<Navigate to="/workout" replace />} />
         <Route path="programs/new" element={<ProgramEditorPage />} />
         <Route path="programs/:programId" element={<ProgramEditorPage />} />
         <Route path="nutrition" element={<NutritionPage />} />

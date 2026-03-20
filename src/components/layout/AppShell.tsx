@@ -1,11 +1,10 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { Dumbbell, LayoutDashboard, BookOpen, Apple, Settings } from 'lucide-react'
+import { Dumbbell, LayoutDashboard, Apple, Settings } from 'lucide-react'
 import { cn } from '@/lib/utils/formatters'
 
 const NAV_ITEMS = [
   { path: '/dashboard', icon: LayoutDashboard, label: 'Home' },
   { path: '/workout', icon: Dumbbell, label: 'Workout' },
-  { path: '/programs', icon: BookOpen, label: 'Programs' },
   { path: '/nutrition', icon: Apple, label: 'Nutrition' },
   { path: '/settings', icon: Settings, label: 'Settings' },
 ]

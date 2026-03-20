@@ -1,8 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Check, Plus, X, ChevronDown, History, Timer } from 'lucide-react'
+import { Check, Plus, X, ChevronDown, History, Timer, Settings } from 'lucide-react'
 import { v4 as uuid } from 'uuid'
-import { PageHeader } from '@/components/layout/PageHeader'
 import { PageSpinner } from '@/components/layout/PageSpinner'
 import { useWorkoutStore } from '@/store/workoutStore'
 import { useProgramStore } from '@/store/programStore'
@@ -42,6 +41,7 @@ export default function WorkoutPage() {
   const [showFinishConfirm, setShowFinishConfirm] = useState(false)
   const [_activeTimer, setActiveTimer] = useState<{ exerciseId: string; setNum: number } | null>(null)
   const [prAlert, setPrAlert] = useState<string | null>(null)
+  const [showProgramDropdown, setShowProgramDropdown] = useState(false)
 
   const { isLoading: loadingPrograms } = useSheetData(TABS.PROGRAMS, parsePrograms, (data) => {
     setPrograms(data)
@@ -91,6 +91,26 @@ export default function WorkoutPage() {
     appendWorkout(workoutToRow(session))
     restTimer.requestNotificationPermission()
     setShowDaySelector(false)
+  }
+
+  async function setActiveProgram(id: string) {
+    setActiveProgramId(id)
+    setSelectedProgramId(id)
+    setShowProgramDropdown(false)
+    if (!sheetId) return
+    try {
+      const rows = await sheetsApi.getRange(sheetId, 'Config!A:C')
+      const now = new Date().toISOString()
+      const rowIdx = rows.findIndex(r => r[0] === 'active_program_id')
+      if (rowIdx >= 0) {
+        await sheetsApi.batchUpdateValues(sheetId, [{
+          range: `Config!A${rowIdx + 1}:C${rowIdx + 1}`,
+          values: [['active_program_id', id, now]]
+        }])
+      } else {
+        await sheetsApi.appendRow(sheetId, 'Config', ['active_program_id', id, now])
+      }
+    } catch (e) { console.error(e) }
   }
 
   function logSet(slot: ExerciseSlot, exercise: Exercise, weightKg: number | undefined, reps: number | undefined, durationSeconds: number | undefined, isWarmup = false) {
@@ -151,83 +171,118 @@ export default function WorkoutPage() {
 
   if (loadingPrograms || loadingWorkouts || loadingSets) return <PageSpinner />
 
-  if (!activeSession && programs.length === 0) {
-    return (
-      <div className="px-6">
-        <PageHeader title="Workout" />
-        <p className="text-sm text-neutral-400 mb-6">No program set up yet.</p>
-        <button onClick={() => navigate('/programs')} className="text-sm underline underline-offset-4">Set up a program →</button>
-      </div>
-    )
-  }
-
   if (!activeSession) {
     return (
       <div className="px-6">
-        <PageHeader title="Start Workout" />
+        {/* Program title / dropdown trigger */}
+        <div className="pt-14 pb-6">
+          {programs.length === 0 ? (
+            <h1 className="text-2xl font-semibold">Workout</h1>
+          ) : (
+            <button
+              onClick={() => setShowProgramDropdown(true)}
+              className="flex items-center gap-1.5"
+            >
+              <h1 className="text-2xl font-semibold">{activeProgram?.name ?? 'Select program'}</h1>
+              <ChevronDown size={20} className="text-neutral-400 mt-0.5 shrink-0" />
+            </button>
+          )}
+        </div>
 
-        {/* Program selector */}
-        {programs.length > 1 && (
-          <div className="mb-6">
-            <p className="text-xs text-neutral-400 uppercase tracking-wider mb-2">Program</p>
-            <div className="flex gap-2 flex-wrap">
-              {programs.map(p => (
-                <button
-                  key={p.id}
-                  onClick={() => setSelectedProgramId(p.id)}
-                  className={cn('text-sm px-3 py-1.5 rounded-full border transition-colors',
-                    (selectedProgramId || activeProgramId) === p.id ? 'border-black bg-black text-white' : 'border-neutral-200 text-neutral-600'
-                  )}
-                >
-                  {p.name}
-                </button>
-              ))}
-            </div>
+        {programs.length === 0 ? (
+          /* Empty state */
+          <div className="space-y-4">
+            <p className="text-sm text-neutral-400">No program yet. Create one to get started.</p>
+            <button
+              onClick={() => navigate('/programs/new')}
+              className="w-full py-4 bg-black text-white text-sm font-medium rounded-xl"
+            >
+              Create a program
+            </button>
           </div>
+        ) : (
+          <>
+            {/* Day selector */}
+            {activeProgram && (
+              <div className="mb-8">
+                <div className="space-y-0">
+                  {activeProgram.days.map((day, idx) => (
+                    <button
+                      key={day.id}
+                      onClick={() => setSelectedDayIdx(idx)}
+                      className="flex items-center justify-between w-full py-4 border-b border-neutral-100 last:border-0 text-left"
+                    >
+                      <div>
+                        <p className={cn('text-sm', idx === selectedDayIdx ? 'font-semibold' : 'font-medium')}>
+                          {day.label}
+                          {idx === suggestedDayIdx && (
+                            <span className="ml-2 text-xs text-neutral-400 font-normal">suggested</span>
+                          )}
+                        </p>
+                        <p className="text-xs text-neutral-400 mt-0.5">{day.exercises.length} exercises</p>
+                      </div>
+                      {idx === selectedDayIdx && <Check size={16} />}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <button
+              onClick={startWorkout}
+              className="w-full py-4 bg-black text-white text-sm font-medium rounded-xl"
+            >
+              Start {currentDay?.label}
+            </button>
+
+            <button onClick={() => navigate('/workout/history')} className="flex items-center gap-2 text-sm text-neutral-400 mt-6 mx-auto">
+              <History size={14} /> View history
+            </button>
+          </>
         )}
 
-        {/* Day selector */}
-        {activeProgram && (
-          <div className="mb-8">
-            <p className="text-xs text-neutral-400 uppercase tracking-wider mb-3">Today's session</p>
-            <div className="space-y-0">
-              {activeProgram.days.map((day, idx) => (
-                <button
-                  key={day.id}
-                  onClick={() => setSelectedDayIdx(idx)}
-                  className={cn(
-                    'flex items-center justify-between w-full py-4 border-b border-neutral-100 last:border-0 text-left',
-                  )}
-                >
-                  <div>
-                    <p className={cn('text-sm', idx === selectedDayIdx ? 'font-semibold' : 'font-medium')}>
-                      {day.label}
-                      {idx === suggestedDayIdx && idx !== selectedDayIdx && (
-                        <span className="ml-2 text-xs text-neutral-400 font-normal">suggested</span>
-                      )}
-                      {idx === suggestedDayIdx && idx === selectedDayIdx && (
-                        <span className="ml-2 text-xs text-neutral-400 font-normal">suggested</span>
-                      )}
-                    </p>
-                    <p className="text-xs text-neutral-400 mt-0.5">{day.exercises.length} exercises</p>
+        {/* Program dropdown sheet */}
+        {showProgramDropdown && (
+          <div
+            className="fixed inset-0 bg-black/20 flex items-end z-50"
+            onClick={() => setShowProgramDropdown(false)}
+          >
+            <div
+              className="bg-white w-full rounded-t-3xl p-6 pb-10"
+              onClick={e => e.stopPropagation()}
+            >
+              <p className="text-xs text-neutral-400 uppercase tracking-wider mb-4">Programs</p>
+              <div className="space-y-0 mb-6">
+                {programs.map(p => (
+                  <div key={p.id} className="flex items-center py-3 border-b border-neutral-100 last:border-0 gap-3">
+                    <button
+                      className="flex-1 flex items-center justify-between text-left"
+                      onClick={() => setActiveProgram(p.id)}
+                    >
+                      <div>
+                        <p className={cn('text-sm', effectiveProgramId === p.id ? 'font-semibold' : 'font-medium')}>{p.name}</p>
+                        <p className="text-xs text-neutral-400">{p.days.length} days</p>
+                      </div>
+                      {effectiveProgramId === p.id && <Check size={16} className="shrink-0" />}
+                    </button>
+                    <button
+                      onClick={() => { navigate(`/programs/${p.id}`); setShowProgramDropdown(false) }}
+                      className="p-2 text-neutral-400 shrink-0"
+                    >
+                      <Settings size={16} />
+                    </button>
                   </div>
-                  {idx === selectedDayIdx && <Check size={16} />}
-                </button>
-              ))}
+                ))}
+              </div>
+              <button
+                onClick={() => { navigate('/programs/new'); setShowProgramDropdown(false) }}
+                className="flex items-center gap-2 text-sm font-medium"
+              >
+                <Plus size={16} /> New program
+              </button>
             </div>
           </div>
         )}
-
-        <button
-          onClick={startWorkout}
-          className="w-full py-4 bg-black text-white text-sm font-medium rounded-xl"
-        >
-          Start {currentDay?.label}
-        </button>
-
-        <button onClick={() => navigate('/workout/history')} className="flex items-center gap-2 text-sm text-neutral-400 mt-6 mx-auto">
-          <History size={14} /> View history
-        </button>
       </div>
     )
   }
@@ -247,7 +302,7 @@ export default function WorkoutPage() {
 
       {/* Rest timer */}
       {restTimer.isActive && (
-        <div className="fixed bottom-20 left-0 right-0 mx-6 z-30">
+        <div className="fixed bottom-6 left-0 right-0 mx-6 z-30">
           <div className="bg-black text-white rounded-2xl p-4 flex items-center justify-between">
             <div>
               <p className="text-xs text-neutral-400">Rest</p>
