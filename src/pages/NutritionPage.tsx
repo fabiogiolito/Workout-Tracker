@@ -244,7 +244,7 @@ export default function NutritionPage() {
 
       {/* Date navigation */}
       <div className="flex items-center justify-between mb-6 -mt-2">
-        <button onClick={() => setViewDate(offsetDate(viewDate, -1))} className="p-2 -ml-2">
+        <button onClick={() => setViewDate(offsetDate(viewDate, -1))} className="p-2 -ml-2 text-neutral-700">
           <ChevronLeft size={18} />
         </button>
         <button
@@ -253,7 +253,7 @@ export default function NutritionPage() {
         >
           {formatViewDate(viewDate)}
         </button>
-        <button onClick={() => setViewDate(offsetDate(viewDate, 1))} className="p-2 -mr-2">
+        <button onClick={() => setViewDate(offsetDate(viewDate, 1))} className="p-2 -mr-2 text-neutral-700">
           <ChevronRight size={18} />
         </button>
       </div>
