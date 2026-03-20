@@ -26,25 +26,43 @@ import * as sheetsApi from '@/lib/google/sheetsApi'
 export default function WorkoutPage() {
   const navigate = useNavigate()
   const { activeSession, activeSets, allSessions, allSets, startSession, finishSession, addSet, loadData } = useWorkoutStore()
-  const { programs, activeProgramId, setPrograms } = useProgramStore()
+  const { programs, activeProgramId, setPrograms, setActiveProgramId } = useProgramStore()
   const sheetId = useSheetStore(s => s.activeSheetId)
   const restTimer = useRestTimer()
   const [_showDaySelector, setShowDaySelector] = useState(false)
-  const [selectedProgramId, setSelectedProgramId] = useState(activeProgramId ?? '')
+  const [selectedProgramId, setSelectedProgramId] = useState('')
+
+  // Sync selectedProgramId once activeProgramId hydrates from localStorage
+  // (zustand persist hydrates after the first render, so useState initial value is always '')
+  useEffect(() => {
+    if (activeProgramId) setSelectedProgramId(activeProgramId)
+  }, [activeProgramId])
   const [selectedDayIdx, setSelectedDayIdx] = useState(0)
   const [expandedExercise, setExpandedExercise] = useState<string | null>(null)
   const [showFinishConfirm, setShowFinishConfirm] = useState(false)
   const [_activeTimer, setActiveTimer] = useState<{ exerciseId: string; setNum: number } | null>(null)
   const [prAlert, setPrAlert] = useState<string | null>(null)
 
-  const { isLoading: loadingPrograms } = useSheetData(TABS.PROGRAMS, parsePrograms, setPrograms)
+  const { isLoading: loadingPrograms } = useSheetData(TABS.PROGRAMS, parsePrograms, (data) => {
+    setPrograms(data)
+    // If activeProgramId isn't in localStorage, try to restore it from the Config sheet
+    if (!activeProgramId && sheetId && data.length > 0) {
+      sheetsApi.getRange(sheetId, 'Config!A:B').then(rows => {
+        const row = rows.find(r => r[0] === 'active_program_id')
+        if (row?.[1] && data.find(p => p.id === row[1])) {
+          setActiveProgramId(row[1])
+        }
+      }).catch(() => {})
+    }
+  })
   const { isLoading: loadingWorkouts } = useSheetData(TABS.WORKOUTS, parseWorkouts, (data) => loadData(data, allSets))
   const { isLoading: loadingSets } = useSheetData(TABS.SETS, parseSets, (data) => loadData(allSessions, data))
   const appendWorkout = useAppendRow(TABS.WORKOUTS)
   const appendSet = useAppendRow(TABS.SETS)
 
-  // Determine suggested day
-  const activeProgram = programs.find(p => p.id === (selectedProgramId || activeProgramId))
+  // Determine suggested day — fall back to first program if no active ID is set yet
+  const effectiveProgramId = selectedProgramId || activeProgramId || programs[0]?.id
+  const activeProgram = programs.find(p => p.id === effectiveProgramId)
   const suggestedDayIdx = (() => {
     if (!activeProgram) return 0
     const finished = allSessions.filter(s => s.finishedAt && s.programId === activeProgram.id)
@@ -133,7 +151,7 @@ export default function WorkoutPage() {
 
   if (loadingPrograms || loadingWorkouts || loadingSets) return <PageSpinner />
 
-  if (!activeSession && (!activeProgram || programs.length === 0)) {
+  if (!activeSession && programs.length === 0) {
     return (
       <div className="px-6">
         <PageHeader title="Workout" />
