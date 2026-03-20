@@ -317,12 +317,17 @@ function ExerciseBlock({ slot, exercise, loggedSets, historySets, isExpanded, on
   const chartData = sessions.slice(-8).map(s => ({ w: s.bestWeight, d: formatDateShort(s.date) }))
   const exerciseTimer = useExerciseTimer(slot.durationSeconds ?? exercise.defaultDurationSeconds ?? 60)
 
-  // Pre-fill weight from suggestion
+  // Pre-fill weight from last session for this exercise
   useEffect(() => {
-    if (suggestion.suggestedWeight > 0 && !weight) {
-      setWeight(String(suggestion.suggestedWeight))
+    if (!weight) {
+      const lastWeight = lastSession?.bestWeight
+      if (lastWeight && lastWeight > 0) {
+        setWeight(String(lastWeight))
+      } else if (suggestion.suggestedWeight > 0) {
+        setWeight(String(suggestion.suggestedWeight))
+      }
     }
-  }, [suggestion.suggestedWeight])
+  }, [lastSession?.bestWeight, suggestion.suggestedWeight])
 
   function handleLog() {
     if (exercise.isTimed) {
@@ -484,9 +489,13 @@ function RepsSetInput({ weight, reps, onWeightChange, onRepsChange, onLog, sugge
       )}
       <div>
         <p className="text-xs text-neutral-400 mb-2">Weight (kg)</p>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <button
-            onClick={() => onWeightChange(String(Math.max(0, Math.round(((parseFloat(weight) || 0) - 2.5) * 4) / 4)))}
+            onClick={() => onWeightChange(String(Math.max(0, (parseFloat(weight) || 0) - 5)))}
+            className="w-9 h-9 flex items-center justify-center border border-neutral-200 rounded-lg text-[11px] font-medium text-neutral-500"
+          >−5</button>
+          <button
+            onClick={() => onWeightChange(String(Math.max(0, (parseFloat(weight) || 0) - 1)))}
             className="w-9 h-9 flex items-center justify-center border border-neutral-200 rounded-lg text-lg font-light"
           >−</button>
           <input
@@ -497,9 +506,13 @@ function RepsSetInput({ weight, reps, onWeightChange, onRepsChange, onLog, sugge
             placeholder="0"
           />
           <button
-            onClick={() => onWeightChange(String(Math.round(((parseFloat(weight) || 0) + 2.5) * 4) / 4))}
+            onClick={() => onWeightChange(String((parseFloat(weight) || 0) + 1))}
             className="w-9 h-9 flex items-center justify-center border border-neutral-200 rounded-lg text-lg font-light"
           >+</button>
+          <button
+            onClick={() => onWeightChange(String((parseFloat(weight) || 0) + 5))}
+            className="w-9 h-9 flex items-center justify-center border border-neutral-200 rounded-lg text-[11px] font-medium text-neutral-500"
+          >+5</button>
         </div>
       </div>
       <div>
