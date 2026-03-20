@@ -10,7 +10,7 @@ import { useSheetStore } from '@/store/sheetStore'
 import { useRestTimer } from '@/hooks/useRestTimer'
 import { useExerciseTimer } from '@/hooks/useExerciseTimer'
 import { useAppendRow, useSheetData } from '@/hooks/useSheetSync'
-import { parseWorkouts, parseSets } from '@/lib/google/sheetReader'
+import { parseWorkouts, parseSets, parsePrograms } from '@/lib/google/sheetReader'
 import { workoutToRow, setToRow } from '@/lib/google/sheetWriter'
 import { suggestNextWeight, getBestPerSession, getPersonalBest, getPersonalBestDuration } from '@/lib/progression/progressionEngine'
 import { EXERCISE_LIBRARY, getExerciseById } from '@/constants/exerciseLibrary'
@@ -26,7 +26,7 @@ import * as sheetsApi from '@/lib/google/sheetsApi'
 export default function WorkoutPage() {
   const navigate = useNavigate()
   const { activeSession, activeSets, allSessions, allSets, startSession, finishSession, addSet, loadData } = useWorkoutStore()
-  const { programs, activeProgramId } = useProgramStore()
+  const { programs, activeProgramId, setPrograms } = useProgramStore()
   const sheetId = useSheetStore(s => s.activeSheetId)
   const restTimer = useRestTimer()
   const [_showDaySelector, setShowDaySelector] = useState(false)
@@ -37,6 +37,7 @@ export default function WorkoutPage() {
   const [_activeTimer, setActiveTimer] = useState<{ exerciseId: string; setNum: number } | null>(null)
   const [prAlert, setPrAlert] = useState<string | null>(null)
 
+  const { isLoading: loadingPrograms } = useSheetData(TABS.PROGRAMS, parsePrograms, setPrograms)
   const { isLoading: loadingWorkouts } = useSheetData(TABS.WORKOUTS, parseWorkouts, (data) => loadData(data, allSets))
   const { isLoading: loadingSets } = useSheetData(TABS.SETS, parseSets, (data) => loadData(allSessions, data))
   const appendWorkout = useAppendRow(TABS.WORKOUTS)
@@ -130,7 +131,7 @@ export default function WorkoutPage() {
     navigate('/dashboard')
   }
 
-  if (loadingWorkouts || loadingSets) return <PageSpinner />
+  if (loadingPrograms || loadingWorkouts || loadingSets) return <PageSpinner />
 
   if (!activeSession && (!activeProgram || programs.length === 0)) {
     return (
