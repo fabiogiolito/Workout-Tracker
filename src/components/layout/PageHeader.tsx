@@ -13,7 +13,7 @@ export function PageHeader({ title, subtitle, back, right }: PageHeaderProps) {
   const navigate = useNavigate()
 
   return (
-    <div className="flex items-start justify-between px-6 pt-14 pb-6">
+    <div className="flex items-start justify-between pt-14 pb-6">
       <div className="flex items-start gap-3">
         {back && (
           <button
