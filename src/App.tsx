@@ -15,15 +15,26 @@ import { useAuthStore } from './store/authStore'
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate()
   const isAuth = useAuthStore(s => s.isAuthenticated)
+  const token = useAuthStore(s => s.token)
+  const signOut = useAuthStore(s => s.signOut)
   const sheetId = useSheetStore(s => s.activeSheetId)
 
+  // Token expiry check: if the stored token is expired, sign out immediately
+  // instead of letting sheetsApi try a background refresh (which opens a popup
+  // that gets blocked on mobile/PWA, causing an infinite loading state).
+  const tokenExpired = isAuth && (token === null || token.expiresAt <= Date.now())
+
   useEffect(() => {
-    if (!isAuth || !sheetId) {
+    if (tokenExpired) signOut()
+  }, [tokenExpired, signOut])
+
+  useEffect(() => {
+    if (!isAuth || !sheetId || tokenExpired) {
       navigate('/connect', { replace: true })
     }
-  }, [isAuth, sheetId, navigate])
+  }, [isAuth, sheetId, tokenExpired, navigate])
 
-  if (!isAuth || !sheetId) return null
+  if (!isAuth || !sheetId || tokenExpired) return null
   return <>{children}</>
 }
 
