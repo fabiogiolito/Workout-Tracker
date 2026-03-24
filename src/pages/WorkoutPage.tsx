@@ -302,7 +302,7 @@ export default function WorkoutPage() {
 
       {/* Rest timer */}
       {restTimer.isActive && (
-        <div className="fixed bottom-6 left-0 right-0 mx-6 z-30">
+        <div className="fixed left-4 right-4 z-30" style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 4.5rem)' }}>
           <div className="bg-black text-white rounded-2xl p-4 flex items-center justify-between">
             <div>
               <p className="text-xs text-neutral-400">Rest</p>
