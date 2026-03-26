@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Check, Trash2, LogOut, Plus } from 'lucide-react'
+import { Check, Trash2, LogOut, Plus, ChevronRight } from 'lucide-react'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { useSheetStore } from '@/store/sheetStore'
 import { useAuthStore } from '@/store/authStore'
