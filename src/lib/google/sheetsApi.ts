@@ -48,6 +48,12 @@ async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
     },
   })
   if (!res.ok) {
+    if (res.status === 403) {
+      throw new Error("You don't have edit permissions to this sheet. Please ask the file owner for access.")
+    }
+    if (res.status === 404) {
+      throw new Error("Sheet not found. Check the URL and make sure the sheet still exists.")
+    }
     const text = await res.text()
     throw new Error(`Sheets API error ${res.status}: ${text}`)
   }
