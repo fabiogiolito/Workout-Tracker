@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronRight, Trash2, LogOut, ExternalLink } from 'lucide-react'
+import { Check, Trash2, LogOut, Plus } from 'lucide-react'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { useSheetStore } from '@/store/sheetStore'
 import { useAuthStore } from '@/store/authStore'
@@ -30,47 +30,39 @@ export default function SettingsPage() {
     <div className="px-6 pb-10">
       <PageHeader title="Settings" />
 
-      {/* Active sheet */}
+      {/* Sheets */}
       <div className="mb-10">
-        <p className="text-xs text-neutral-400 uppercase tracking-wider mb-4">Connected sheet</p>
-        {activeSheetTitle && (
-          <div className="flex items-center justify-between py-3 border-b border-neutral-100">
-            <p className="text-sm font-medium">{activeSheetTitle}</p>
-            <span className="text-xs text-neutral-400">active</span>
-          </div>
-        )}
-        <button
-          onClick={() => navigate('/connect')}
-          className="flex items-center gap-2 text-sm text-neutral-400 mt-3"
-        >
-          Connect different sheet <ChevronRight size={14} />
-        </button>
-      </div>
-
-      {/* Sheet history */}
-      {sheetHistory.length > 1 && (
-        <div className="mb-10">
-          <p className="text-xs text-neutral-400 uppercase tracking-wider mb-4">Sheet history</p>
-          <div className="space-y-0">
-            {sheetHistory.map(meta => (
-              <div key={meta.id} className="flex items-center justify-between py-3 border-b border-neutral-100">
-                <button
-                  className="flex-1 text-left"
-                  onClick={() => {
+        <p className="text-xs text-neutral-400 uppercase tracking-wider mb-4">Sheets</p>
+        <div className="space-y-0">
+          {sheetHistory.map(meta => (
+            <div key={meta.id} className="flex items-center py-3 border-b border-neutral-100 gap-3">
+              <button
+                className="flex-1 flex items-center justify-between text-left"
+                onClick={() => {
+                  if (meta.id !== activeSheetId) {
                     setActiveSheet(meta)
                     navigate('/dashboard')
-                  }}
-                >
-                  <p className={`text-sm ${meta.id === activeSheetId ? 'font-medium' : ''}`}>{meta.title}</p>
-                </button>
-                <button onClick={() => removeFromHistory(meta.id)} className="text-neutral-300 p-1 ml-2">
+                  }
+                }}
+              >
+                <p className={`text-sm ${meta.id === activeSheetId ? 'font-semibold' : ''}`}>{meta.title}</p>
+                {meta.id === activeSheetId && <Check size={16} className="shrink-0" />}
+              </button>
+              {meta.id !== activeSheetId && (
+                <button onClick={() => removeFromHistory(meta.id)} className="text-neutral-300 p-1 shrink-0">
                   <Trash2 size={14} />
                 </button>
-              </div>
-            ))}
-          </div>
+              )}
+            </div>
+          ))}
         </div>
-      )}
+        <button
+          onClick={() => navigate('/connect')}
+          className="flex items-center gap-2 text-sm text-neutral-400 mt-4"
+        >
+          <Plus size={14} /> Connect another sheet
+        </button>
+      </div>
 
       {/* Macro goals */}
       <div className="mb-10">
