@@ -251,7 +251,7 @@ export default function WorkoutPage() {
               className="bg-white w-full rounded-t-3xl p-6 pb-10"
               onClick={e => e.stopPropagation()}
             >
-              <p className="text-xs text-neutral-400 uppercase tracking-wider mb-4">Programs</p>
+              <p className="text-xs font-semibold uppercase tracking-wider mb-4">Programs</p>
               <div className="space-y-0 mb-6">
                 {programs.map(p => (
                   <div key={p.id} className="flex items-center py-3 border-b border-neutral-100 last:border-0 gap-3">
@@ -361,7 +361,7 @@ export default function WorkoutPage() {
             <p className="text-lg font-semibold mb-2">Finish workout?</p>
             <p className="text-sm text-neutral-400 mb-6">{activeSets.filter(s => !s.isWarmup).length} sets logged</p>
             <div className="flex gap-3">
-              <button onClick={() => setShowFinishConfirm(false)} className="flex-1 py-3 border border-neutral-200 rounded-xl text-sm">Cancel</button>
+              <button onClick={() => setShowFinishConfirm(false)} className="flex-1 py-3 bg-neutral-100 rounded-xl text-sm font-medium">Cancel</button>
               <button onClick={handleFinish} className="flex-1 py-3 bg-black text-white rounded-xl text-sm font-medium">Finish</button>
             </div>
           </div>
@@ -526,9 +526,9 @@ function TimedSetInput({ exerciseTimer, onLog, slot, exercise }: {
           </div>
           <div className="flex gap-2">
             {exerciseTimer.state === 'running' ? (
-              <button onClick={exerciseTimer.pause} className="text-sm px-3 py-1.5 border border-neutral-200 rounded-lg">Pause</button>
+              <button onClick={exerciseTimer.pause} className="text-sm px-3 py-1.5 bg-neutral-100 rounded-lg">Pause</button>
             ) : (
-              <button onClick={exerciseTimer.resume} className="text-sm px-3 py-1.5 border border-neutral-200 rounded-lg">Resume</button>
+              <button onClick={exerciseTimer.resume} className="text-sm px-3 py-1.5 bg-neutral-100 rounded-lg">Resume</button>
             )}
             <button onClick={() => { onLog(); exerciseTimer.reset() }} className="text-sm px-3 py-1.5 bg-black text-white rounded-lg">Log set</button>
           </div>
@@ -566,11 +566,11 @@ function RepsSetInput({ weight, reps, onWeightChange, onRepsChange, onLog, sugge
         <div className="flex items-center gap-2">
           <button
             onClick={() => onWeightChange(String(Math.max(0, (parseFloat(weight) || 0) - 5)))}
-            className="w-9 h-9 flex items-center justify-center border border-neutral-200 rounded-lg text-[11px] font-medium text-neutral-500"
+            className="w-9 h-9 flex items-center justify-center bg-neutral-100 rounded-lg text-[11px] font-semibold"
           >−5</button>
           <button
             onClick={() => onWeightChange(String(Math.max(0, (parseFloat(weight) || 0) - 1)))}
-            className="w-9 h-9 flex items-center justify-center border border-neutral-200 rounded-lg text-lg font-light"
+            className="w-9 h-9 flex items-center justify-center bg-neutral-100 rounded-lg text-lg font-medium"
           >−</button>
           <input
             type="number"
@@ -581,11 +581,11 @@ function RepsSetInput({ weight, reps, onWeightChange, onRepsChange, onLog, sugge
           />
           <button
             onClick={() => onWeightChange(String((parseFloat(weight) || 0) + 1))}
-            className="w-9 h-9 flex items-center justify-center border border-neutral-200 rounded-lg text-lg font-light"
+            className="w-9 h-9 flex items-center justify-center bg-neutral-100 rounded-lg text-lg font-medium"
           >+</button>
           <button
             onClick={() => onWeightChange(String((parseFloat(weight) || 0) + 5))}
-            className="w-9 h-9 flex items-center justify-center border border-neutral-200 rounded-lg text-[11px] font-medium text-neutral-500"
+            className="w-9 h-9 flex items-center justify-center bg-neutral-100 rounded-lg text-[11px] font-semibold"
           >+5</button>
         </div>
       </div>
@@ -594,7 +594,7 @@ function RepsSetInput({ weight, reps, onWeightChange, onRepsChange, onLog, sugge
         <div className="flex items-center gap-3">
           <button
             onClick={() => onRepsChange(String(Math.max(0, (parseInt(reps) || 0) - 1)))}
-            className="w-9 h-9 flex items-center justify-center border border-neutral-200 rounded-lg text-lg font-light"
+            className="w-9 h-9 flex items-center justify-center bg-neutral-100 rounded-lg text-lg font-medium"
           >−</button>
           <input
             type="number"
@@ -605,7 +605,7 @@ function RepsSetInput({ weight, reps, onWeightChange, onRepsChange, onLog, sugge
           />
           <button
             onClick={() => onRepsChange(String((parseInt(reps) || 0) + 1))}
-            className="w-9 h-9 flex items-center justify-center border border-neutral-200 rounded-lg text-lg font-light"
+            className="w-9 h-9 flex items-center justify-center bg-neutral-100 rounded-lg text-lg font-medium"
           >+</button>
         </div>
       </div>

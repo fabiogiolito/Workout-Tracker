@@ -18,13 +18,13 @@ export function PageHeader({ title, subtitle, back, right }: PageHeaderProps) {
         {back && (
           <button
             onClick={() => typeof back === 'string' ? navigate(back) : navigate(-1)}
-            className="mt-0.5 -ml-1 p-1 text-neutral-400 hover:text-black transition-colors"
+            className="mt-0.5 -ml-1 p-1 text-black"
           >
-            <ArrowLeft size={20} strokeWidth={1.5} />
+            <ArrowLeft size={20} strokeWidth={2} />
           </button>
         )}
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
           {subtitle && <p className="text-sm text-neutral-400 mt-0.5">{subtitle}</p>}
         </div>
       </div>

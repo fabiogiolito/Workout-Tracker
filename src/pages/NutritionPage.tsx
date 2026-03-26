@@ -282,7 +282,7 @@ export default function NutritionPage() {
       {isToday && (
         <div className="mb-10">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-xs text-neutral-400 uppercase tracking-wider">Water</p>
+            <p className="text-xs font-semibold uppercase tracking-wider">Water</p>
             <p className="text-xs text-neutral-400">{(waterToday / 1000).toFixed(1)}L / {macroGoals.waterMl / 1000}L</p>
           </div>
           <div className="h-1 bg-neutral-100 rounded mb-3">
@@ -290,7 +290,7 @@ export default function NutritionPage() {
           </div>
           <div className="flex gap-2">
             {WATER_AMOUNTS.map(ml => (
-              <button key={ml} onClick={() => addWater(ml)} className="text-xs px-3 py-1.5 border border-neutral-200 rounded-full">
+              <button key={ml} onClick={() => addWater(ml)} className="text-xs px-3 py-1.5 bg-neutral-100 rounded-full font-medium">
                 +{ml}ml
               </button>
             ))}
@@ -315,7 +315,7 @@ export default function NutritionPage() {
                   <p className="text-xs">{entry.foodName}</p>
                   <p className="text-xs text-neutral-400">{entry.quantityG}g · {Math.round(entry.calories)}kcal · {Math.round(entry.proteinG)}g protein</p>
                 </div>
-                <button onClick={() => removeEntry(entry.id)} className="text-neutral-300 p-1 ml-2">
+                <button onClick={() => removeEntry(entry.id)} className="text-neutral-400 p-1 ml-2">
                   <X size={12} />
                 </button>
               </div>
@@ -349,7 +349,7 @@ export default function NutritionPage() {
                 <button
                   key={m}
                   onClick={() => setSelectedMeal(m)}
-                  className={cn('text-xs px-2.5 py-1 rounded-full border', selectedMeal === m ? 'border-black bg-black text-white' : 'border-neutral-200')}
+                  className={cn('text-xs px-2.5 py-1 rounded-full font-medium', selectedMeal === m ? 'bg-black text-white' : 'bg-neutral-100')}
                 >
                   {m}
                 </button>
@@ -397,7 +397,7 @@ export default function NutritionPage() {
                     {food.isCustom && (
                       <button
                         onClick={() => startEditFood(food)}
-                        className="px-4 py-3 text-neutral-300 hover:text-neutral-600 transition-colors"
+                        className="px-4 py-3 text-neutral-400"
                       >
                         <Pencil size={14} />
                       </button>
@@ -465,7 +465,7 @@ export default function NutritionPage() {
                 <button onClick={addFood} className="flex-1 py-3 bg-black text-white rounded-xl text-sm font-medium">
                   Add to {selectedMeal}
                 </button>
-                <button onClick={() => { setSelectedFood(null); setModalScreen('search') }} className="px-4 py-3 border border-neutral-200 rounded-xl text-sm">
+                <button onClick={() => { setSelectedFood(null); setModalScreen('search') }} className="px-4 py-3 bg-neutral-100 rounded-xl text-sm font-medium">
                   Back
                 </button>
               </div>
@@ -501,7 +501,7 @@ export default function NutritionPage() {
                 >
                   Save food
                 </button>
-                <button onClick={() => setModalScreen('search')} className="px-4 py-3 border border-neutral-200 rounded-xl text-sm">
+                <button onClick={() => setModalScreen('search')} className="px-4 py-3 bg-neutral-100 rounded-xl text-sm font-medium">
                   Back
                 </button>
               </div>
@@ -535,7 +535,7 @@ export default function NutritionPage() {
                 </button>
                 <button
                   onClick={() => { setEditingFood(null); setModalScreen(selectedFood ? 'quantity' : 'search') }}
-                  className="px-4 py-3 border border-neutral-200 rounded-xl text-sm"
+                  className="px-4 py-3 bg-neutral-100 rounded-xl text-sm font-medium"
                 >
                   Cancel
                 </button>
@@ -569,7 +569,7 @@ function MacroRow({ label, value, goal, unit }: { label: string; value: number; 
   return (
     <div>
       <div className="flex justify-between text-xs mb-0.5">
-        <span className="text-neutral-600">{label}</span>
+        <span className="font-medium">{label}</span>
         <span className="text-neutral-400">{Math.round(value)}/{goal}{unit}</span>
       </div>
       <div className="h-1 bg-neutral-100 rounded w-32">

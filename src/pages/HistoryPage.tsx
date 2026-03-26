@@ -48,14 +48,14 @@ export default function HistoryPage() {
 
       {/* Exercise progress section */}
       <div className="mb-10">
-        <p className="text-xs text-neutral-400 uppercase tracking-wider mb-4">Progress by exercise</p>
+        <p className="text-xs font-semibold uppercase tracking-wider mb-4">Progress by exercise</p>
         <div className="flex flex-wrap gap-2 mb-4">
           {exercisesWithHistory.map(e => (
             <button
               key={e.id}
               onClick={() => setSelectedExercise(selectedExercise === e.id ? null : e.id)}
-              className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
-                selectedExercise === e.id ? 'border-black bg-black text-white' : 'border-neutral-200'
+              className={`text-xs px-3 py-1.5 rounded-full font-medium ${
+                selectedExercise === e.id ? 'bg-black text-white' : 'bg-neutral-100'
               }`}
             >
               {e.name}
@@ -94,7 +94,7 @@ export default function HistoryPage() {
       </div>
 
       {/* Session list */}
-      <p className="text-xs text-neutral-400 uppercase tracking-wider mb-4">Sessions</p>
+      <p className="text-xs font-semibold uppercase tracking-wider mb-4">Sessions</p>
       {finishedSessions.length === 0 && (
         <p className="text-sm text-neutral-400">No completed sessions yet</p>
       )}
@@ -130,7 +130,7 @@ export default function HistoryPage() {
                     const ex = getExerciseById(exId)
                     return (
                       <div key={exId} className="pl-4">
-                        <p className="text-xs font-medium text-neutral-600">{ex?.name ?? exId}</p>
+                        <p className="text-xs font-medium">{ex?.name ?? exId}</p>
                         <div className="flex flex-wrap gap-2 mt-1">
                           {exSets.map(s => (
                             <span key={s.id} className="text-xs text-neutral-400">

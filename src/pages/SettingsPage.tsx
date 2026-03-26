@@ -32,7 +32,7 @@ export default function SettingsPage() {
 
       {/* Sheets */}
       <div className="mb-10">
-        <p className="text-xs text-neutral-400 uppercase tracking-wider mb-4">Sheets</p>
+        <p className="text-xs font-semibold uppercase tracking-wider mb-4">Sheets</p>
         <div className="space-y-0">
           {sheetHistory.map(meta => (
             <div key={meta.id} className="flex items-center py-3 border-b border-neutral-100 gap-3">
@@ -67,8 +67,8 @@ export default function SettingsPage() {
       {/* Macro goals */}
       <div className="mb-10">
         <div className="flex items-center justify-between mb-4">
-          <p className="text-xs text-neutral-400 uppercase tracking-wider">Macro goals</p>
-          <button onClick={() => setEditMacros(!editMacros)} className="text-xs text-neutral-400">
+          <p className="text-xs font-semibold uppercase tracking-wider">Macro goals</p>
+          <button onClick={() => setEditMacros(!editMacros)} className="text-xs font-semibold">
             {editMacros ? 'Cancel' : 'Edit'}
           </button>
         </div>
@@ -85,7 +85,7 @@ export default function SettingsPage() {
                 />
               </div>
             ))}
-            <button onClick={saveMacros} className="text-sm px-4 py-2 bg-black text-white rounded-lg mt-2">Save</button>
+            <button onClick={saveMacros} className="text-sm font-medium px-4 py-2 bg-black text-white rounded-lg mt-2">Save</button>
           </div>
         ) : (
           <div className="space-y-1">
@@ -108,7 +108,7 @@ export default function SettingsPage() {
 
       {/* Account */}
       <div className="mb-6">
-        <p className="text-xs text-neutral-400 uppercase tracking-wider mb-4">Account</p>
+        <p className="text-xs font-semibold uppercase tracking-wider mb-4">Account</p>
         {isAuthenticated && (
           <button
             onClick={handleSignOut}

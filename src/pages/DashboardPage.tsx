@@ -188,7 +188,7 @@ export default function DashboardPage() {
 
       {/* Next workout */}
       <div className="mb-10">
-        <p className="text-xs text-neutral-400 uppercase tracking-wider mb-4">Next workout</p>
+        <p className="text-xs font-semibold uppercase tracking-wider mb-4">Next workout</p>
         {activeProgram && suggestedDay ? (
           <button
             onClick={() => navigate('/workout')}
@@ -200,7 +200,7 @@ export default function DashboardPage() {
                 {activeProgram.name} · {suggestedDay.exercises.length} exercises
               </p>
             </div>
-            <ArrowRight size={20} className="text-neutral-300" />
+            <ArrowRight size={20} className="text-neutral-400" />
           </button>
         ) : (
           <button
@@ -216,7 +216,7 @@ export default function DashboardPage() {
       {/* Last session */}
       {lastSession && (
         <div className="mb-10">
-          <p className="text-xs text-neutral-400 uppercase tracking-wider mb-4">Last session</p>
+          <p className="text-xs font-semibold uppercase tracking-wider mb-4">Last session</p>
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium">{lastSession.dayLabel}</p>
@@ -234,7 +234,7 @@ export default function DashboardPage() {
 
       {/* Body metrics */}
       <div className="mb-10">
-        <p className="text-xs text-neutral-400 uppercase tracking-wider mb-4">Body</p>
+        <p className="text-xs font-semibold uppercase tracking-wider mb-4">Body</p>
         <button onClick={() => setShowMetrics(true)} className="flex gap-8 text-left w-full">
           {latestMetric?.bodyWeightKg ? (
             <div>
@@ -263,7 +263,7 @@ export default function DashboardPage() {
 
       {/* Nutrition summary */}
       <div className="mb-10">
-        <p className="text-xs text-neutral-400 uppercase tracking-wider mb-4">Today's nutrition</p>
+        <p className="text-xs font-semibold uppercase tracking-wider mb-4">Today's nutrition</p>
         <div className="flex gap-8">
           <button onClick={() => navigate('/nutrition')} className="text-left">
             <div className="flex items-baseline gap-1">
@@ -298,13 +298,13 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between mb-6">
               <p className="text-lg font-semibold">Body Metrics</p>
               <button onClick={() => { setShowMetrics(false); resetMetricForm() }}>
-                <X size={20} className="text-neutral-400" />
+                <X size={20} />
               </button>
             </div>
 
             {/* Add / edit form */}
             <div className="mb-6 pb-6 border-b border-neutral-100">
-              <p className="text-xs text-neutral-400 uppercase tracking-wider mb-3">
+              <p className="text-xs font-semibold uppercase tracking-wider mb-3">
                 {editingId ? 'Edit entry' : 'Log today'}
               </p>
               <div className="flex gap-6 mb-4">
@@ -338,7 +338,7 @@ export default function DashboardPage() {
                   {editingId ? 'Update' : 'Log'}
                 </button>
                 {editingId && (
-                  <button onClick={resetMetricForm} className="text-sm px-4 py-2 border border-neutral-200 rounded-lg">
+                  <button onClick={resetMetricForm} className="text-sm px-4 py-2 bg-neutral-100 rounded-lg">
                     Cancel
                   </button>
                 )}
@@ -348,7 +348,7 @@ export default function DashboardPage() {
             {/* History */}
             {sortedMetrics.length > 0 && (
               <div>
-                <p className="text-xs text-neutral-400 uppercase tracking-wider mb-3">History</p>
+                <p className="text-xs font-semibold uppercase tracking-wider mb-3">History</p>
                 <div className="space-y-0">
                   {[...sortedMetrics].reverse().map(m => (
                     <button
@@ -356,8 +356,8 @@ export default function DashboardPage() {
                       onClick={() => openEditMetric(m)}
                       className={`flex items-center justify-between w-full py-3 border-b border-neutral-100 text-left ${editingId === m.id ? 'opacity-40' : ''}`}
                     >
-                      <p className="text-sm text-neutral-600">{formatDateShort(m.date)}</p>
-                      <div className="flex gap-4 text-sm text-neutral-400">
+                      <p className="text-sm">{formatDateShort(m.date)}</p>
+                      <div className="flex gap-4 text-sm text-neutral-500">
                         {m.bodyWeightKg && <span>{m.bodyWeightKg}kg</span>}
                         {m.bodyFatPct && <span>{m.bodyFatPct}%</span>}
                       </div>

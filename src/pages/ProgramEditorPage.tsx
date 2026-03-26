@@ -121,7 +121,7 @@ export default function ProgramEditorPage() {
         title={isNew ? 'New Program' : 'Edit Program'}
         back="/programs"
         right={
-          <button onClick={save} disabled={saving || !name.trim()} className="text-sm font-medium disabled:opacity-40">
+          <button onClick={save} disabled={saving || !name.trim()} className="text-sm font-semibold disabled:opacity-40">
             {saving ? 'Saving…' : 'Save'}
           </button>
         }
@@ -155,7 +155,7 @@ export default function ProgramEditorPage() {
 
       <button
         onClick={addDay}
-        className="flex items-center gap-2 text-sm text-neutral-400 mt-6"
+        className="flex items-center gap-2 text-sm font-medium mt-6"
       >
         <Plus size={16} /> Add day
       </button>
@@ -185,7 +185,7 @@ export default function ProgramEditorPage() {
           <div className="px-6 py-3 flex gap-2 flex-wrap border-b border-neutral-100">
             <button
               onClick={() => setMuscleFilter(null)}
-              className={cn('text-xs px-2.5 py-1 rounded-full border', !muscleFilter ? 'border-black bg-black text-white' : 'border-neutral-200')}
+              className={cn('text-xs px-2.5 py-1 rounded-full font-medium', !muscleFilter ? 'bg-black text-white' : 'bg-neutral-100')}
             >
               All
             </button>
@@ -193,7 +193,7 @@ export default function ProgramEditorPage() {
               <button
                 key={m}
                 onClick={() => setMuscleFilter(muscleFilter === m ? null : m)}
-                className={cn('text-xs px-2.5 py-1 rounded-full border capitalize', muscleFilter === m ? 'border-black bg-black text-white' : 'border-neutral-200')}
+                className={cn('text-xs px-2.5 py-1 rounded-full font-medium capitalize', muscleFilter === m ? 'bg-black text-white' : 'bg-neutral-100')}
               >
                 {m.replace('_', ' ')}
               </button>
@@ -248,7 +248,7 @@ function DayEditor({ day, isExpanded, onToggle, onLabelChange, onRemove, onAddEx
             onClick={e => e.stopPropagation()}
           />
         </button>
-        <button onClick={onRemove} className="text-neutral-300 hover:text-neutral-600 p-1">
+        <button onClick={onRemove} className="text-neutral-400 p-1">
           <Trash2 size={14} />
         </button>
       </div>
@@ -299,13 +299,13 @@ function DayEditor({ day, isExpanded, onToggle, onLabelChange, onRemove, onAddEx
                     </div>
                   </div>
                 </div>
-                <button onClick={() => onRemoveExercise(slot.exerciseId)} className="text-neutral-300 mt-1 p-1">
+                <button onClick={() => onRemoveExercise(slot.exerciseId)} className="text-neutral-400 mt-1 p-1">
                   <X size={14} />
                 </button>
               </div>
             )
           })}
-          <button onClick={onAddExercise} className="flex items-center gap-1 text-xs text-neutral-400">
+          <button onClick={onAddExercise} className="flex items-center gap-1 text-xs font-medium">
             <Plus size={12} /> Add exercise
           </button>
         </div>
